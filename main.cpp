@@ -55,6 +55,30 @@ void Hello()
 
 //---------------------------------------------------------------------------------------------
 
+float F1(float R, float r, float D)
+{
+    return 2.0 * acos((R * R - r * r + D * D) / (2.0 * R * D));
+}
+
+float F2(float R, float r, float D)
+{
+    return 2.0 * acos((r * r - R * R + D * D) / (2.0 * r * D));
+}
+
+float NewRadius(float R, float r, float D, float Square)
+{
+    bool i = true;
+    while(i)
+    {
+        float Square1 = (((R * R * F1(R, r, D)) - sin(F1(R, r, D))) / 2.0) + (((r * r * F2(R, r, D)) - sin(F2(R, r, D))) / 2.0);
+        if(Square1 > Square) i = false;
+        r += 0.0001;
+    }
+    return r;
+}
+
+//---------------------------------------------------------------------------------------------
+
 int main(int argc, const char * argv[])
 {
     Hello();
@@ -79,7 +103,7 @@ int main(int argc, const char * argv[])
     float *SingleVolume = new float[100]; // Объем поварешки
     float *X = new float[100];            // Координаты
     float *Y = new float[100];            // центра блина
-
+    
     input >> Diametr;
     cout << Diametr << endl;
     input >> Height;
@@ -94,7 +118,7 @@ int main(int argc, const char * argv[])
         if(SingleVolume[Counter] <= 0)
         {
             cout << "Введены неверные данные!" << endl;
-            exit(1);
+            exit(3);
         }
         cout << SingleVolume[Counter] << endl;
         input >> X[Counter] >> Y[Counter];
@@ -108,9 +132,15 @@ int main(int argc, const char * argv[])
     for(int k = 0; k < Counter; ++k)
     {
         SingleVolume[k] = SingleVolume[k] / Height; // Находим площадь каждого блина
-        Radius[k] = pow(SingleVolume[k] / Pi, 0.5); // Находим радиус этого круга (при условии, что
-    }                                               // он не пересекается стенками сковороды)
+        Radius[k] = sqrt(SingleVolume[k] / Pi);     // Находим радиус этого круга (при условии, что
+                                                    // он не пересекается стенками сковороды)
+        if((sqrt(pow(X[k], 2) + pow(Y[k], 2)) + Radius[k]) >= (Diametr / 2.0))
+           {
+               Radius[k] = NewRadius(Diametr / 2.0, Radius[k], sqrt(pow(X[k], 2) + pow(Y[k], 2)), SingleVolume[k]);
+           }   // Вычисляем радиус блина, соприкасающегося со стенкой
+    }
     
+
     
     return 0;
 }
