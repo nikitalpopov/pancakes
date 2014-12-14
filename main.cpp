@@ -97,15 +97,18 @@ int main(int argc, const char * argv[])
         }
     } // Проверка на доступность файлов
     
-    float Diametr = 0;                        // Диаметр сковороды
-    float Height = 0;                         // Толщина блина
-    float TotalVolume = 0;                    // Объем кастрюли
+    float Diametr = 0;                    // Диаметр сковороды
+    float Height = 0;                     // Толщина блина
+    float TotalVolume = 0;                // Объем кастрюли
     float *SingleVolume = new float[100]; // Объем поварешки
     float *X = new float[100];            // Координаты
     float *Y = new float[100];            // центра блина
-    int Ideal = 0;                        // Кол-во идеальных блинов
+    float Ideal = 0;                        // Кол-во идеальных блинов
     int StepVolume = 0;                   // Свободное место на сковороде
                                           // в этом подходе
+    int Step = 0;                         // Кол-во подходов
+    int Counter = 0;                      // Счетчик
+    int Total = 0;                        // Всего блинов
     
     input >> Diametr;
     cout << Diametr << endl;
@@ -113,7 +116,6 @@ int main(int argc, const char * argv[])
     cout << Height << endl;
     input >> TotalVolume;
     cout << TotalVolume << endl;
-    int Counter = 0;
     int i = TotalVolume;
     while(i >= 0)
     {
@@ -130,12 +132,15 @@ int main(int argc, const char * argv[])
         ++Counter;
     }
     
+    int k = Counter - 1;
     float *Radius = new float[Counter];
     float  Pi = 3.14159265358979;
     while(Counter != 0)
     {
         StepVolume = TotalVolume / Height;
-        for(int k = 0; k < Counter; ++k)
+        ++Step;
+        cout << Step << " ------ \n";
+        for(; k > 0; --k)
         {
             SingleVolume[k] = SingleVolume[k] / Height; // Находим площадь каждого блина
             Radius[k] = sqrt(SingleVolume[k] / Pi);     // Находим радиус этого круга (при условии, что
@@ -151,31 +156,54 @@ int main(int argc, const char * argv[])
             }
             
             bool Opportunity = true; // Возможность выпечь блин (true - нет на пути других блинов)
-            for(int i = 0; i < k; ++i)
+            for(int i = Counter - 1; i > k; --i)
             {
-                while(Opportunity)
+                if(Opportunity)
                 {
+                    // cout << "// " << sqrt(pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2)) << ">=" << Radius[i] + Radius[k] << endl;
                     if((sqrt(pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2))) >= Radius[i] + Radius[k])
                     {
                         Opportunity = false; // Если блин попадает на уже жарящийся блин
                     }
                 }
+                else
+                {
+                    break;
+                }
             }
             
+            cout << "Step " << Step << endl;
+            cout << "Opportunity " << Opportunity << endl;
+            cout << StepVolume << " > " << Pi * Radius[k] * Radius[k] << endl;
             if(Opportunity || (StepVolume > (Pi * Radius[k] * Radius[k])))
             {
+                // cout << "/ " << sqrt(pow(X[k], 2) + pow(Y[k], 2)) + Radius[k] << " <= " << (Diametr / 2.0) << endl;
                 if((sqrt(pow(X[k], 2) + pow(Y[k], 2)) + Radius[k]) <= (Diametr / 2.0))
                 {
+                    if(Radius[k] == Diametr)
+                    {
+                        break;
+                    }
                     ++Ideal;
+                    cout << Ideal << " ---- \n";
+                    ++Total;
                     StepVolume = StepVolume - Pi * Radius[k] * Radius[k];
+                    Radius[k] = Diametr;
                     --Counter;
                 }
+                
                 if((sqrt(pow(X[k], 2) + pow(Y[k], 2)) + Radius[k]) > (Diametr / 2.0))
                 {
+                    if(Radius[k] == Diametr)
+                    {
+                        break;
+                    }
+                    ++Total;
                     Radius[k] = NewRadius(Diametr / 2.0, Radius[k], sqrt(pow(X[k], 2) + pow(Y[k], 2)), SingleVolume[k]);
                     StepVolume = StepVolume - Pi * Radius[k] * Radius[k];
                     --Counter;
                 }   // Вычисляем радиус блина, соприкасающегося со стенкой
+                cout << "Total " << Total << endl;
             }
             else
             {
@@ -184,7 +212,10 @@ int main(int argc, const char * argv[])
         }
     }
     
-
+    output << "Кол-во идеальных блинов: " << Ideal << endl;
+    Ideal = (Ideal / Total) * 100.0;
+    output << "Т.е. " << Ideal << " процентов от всех блинов" << endl;
+    output << "Кол-во подходов: " << Step; // НЕПРАВИЛЬНО СЧИТАЕТ, ОСТАЛЬНОЕ ВЕРНО, ВРОДЕ
     
     return 0;
 }
