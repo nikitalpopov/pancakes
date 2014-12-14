@@ -97,12 +97,15 @@ int main(int argc, const char * argv[])
         }
     } // Проверка на доступность файлов
     
-    float Diametr;                        // Диаметр сковороды
-    float Height;                         // Толщина блина
-    float TotalVolume;                    // Объем кастрюли
+    float Diametr = 0;                        // Диаметр сковороды
+    float Height = 0;                         // Толщина блина
+    float TotalVolume = 0;                    // Объем кастрюли
     float *SingleVolume = new float[100]; // Объем поварешки
     float *X = new float[100];            // Координаты
     float *Y = new float[100];            // центра блина
+    int Ideal = 0;                        // Кол-во идеальных блинов
+    int StepVolume = 0;                   // Свободное место на сковороде
+                                          // в этом подходе
     
     input >> Diametr;
     cout << Diametr << endl;
@@ -129,15 +132,56 @@ int main(int argc, const char * argv[])
     
     float *Radius = new float[Counter];
     float  Pi = 3.14159265358979;
-    for(int k = 0; k < Counter; ++k)
+    while(Counter != 0)
     {
-        SingleVolume[k] = SingleVolume[k] / Height; // Находим площадь каждого блина
-        Radius[k] = sqrt(SingleVolume[k] / Pi);     // Находим радиус этого круга (при условии, что
-                                                    // он не пересекается стенками сковороды)
-        if((sqrt(pow(X[k], 2) + pow(Y[k], 2)) + Radius[k]) >= (Diametr / 2.0))
-           {
-               Radius[k] = NewRadius(Diametr / 2.0, Radius[k], sqrt(pow(X[k], 2) + pow(Y[k], 2)), SingleVolume[k]);
-           }   // Вычисляем радиус блина, соприкасающегося со стенкой
+        StepVolume = TotalVolume / Height;
+        for(int k = 0; k < Counter; ++k)
+        {
+            SingleVolume[k] = SingleVolume[k] / Height; // Находим площадь каждого блина
+            Radius[k] = sqrt(SingleVolume[k] / Pi);     // Находим радиус этого круга (при условии, что
+                                                        // он не пересекается стенками сковороды)
+            if((X[k] * X[k] + Y[k] * Y[k]) >= (Diametr * Diametr / 4.0))
+            {
+                Radius[k] = Diametr;
+            }
+            if(Radius[k] >= Diametr / 2.0)
+            {
+                cout << k << "ый блин не может быть выпечен\n";
+                --Counter;
+            }
+            
+            bool Opportunity = true; // Возможность выпечь блин (true - нет на пути других блинов)
+            for(int i = 0; i < k; ++i)
+            {
+                while(Opportunity)
+                {
+                    if((sqrt(pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2))) >= Radius[i] + Radius[k])
+                    {
+                        Opportunity = false; // Если блин попадает на уже жарящийся блин
+                    }
+                }
+            }
+            
+            if(Opportunity || (StepVolume > (Pi * Radius[k] * Radius[k])))
+            {
+                if((sqrt(pow(X[k], 2) + pow(Y[k], 2)) + Radius[k]) <= (Diametr / 2.0))
+                {
+                    ++Ideal;
+                    StepVolume = StepVolume - Pi * Radius[k] * Radius[k];
+                    --Counter;
+                }
+                if((sqrt(pow(X[k], 2) + pow(Y[k], 2)) + Radius[k]) > (Diametr / 2.0))
+                {
+                    Radius[k] = NewRadius(Diametr / 2.0, Radius[k], sqrt(pow(X[k], 2) + pow(Y[k], 2)), SingleVolume[k]);
+                    StepVolume = StepVolume - Pi * Radius[k] * Radius[k];
+                    --Counter;
+                }   // Вычисляем радиус блина, соприкасающегося со стенкой
+            }
+            else
+            {
+                break;
+            }
+        }
     }
     
 
