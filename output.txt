@@ -1,4 +1,4 @@
-//Users/nikitapopov/Documents/XCode/Pancakes/Pancakes/input5.txt
-Кол-во идеальных блинов: 20
-Т.е. 100 процентов от всех (20) блинов
-Кол-во подходов: 5
+//Users/nikitapopov/Documents/XCode/Pancakes/Pancakes/input10.txt
+Кол-во идеальных блинов: 4
+Т.е. 100 процентов от всех (4) блинов
+Кол-во подходов: 1

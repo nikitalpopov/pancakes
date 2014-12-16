@@ -100,11 +100,12 @@ int main(int argc, const char * argv[])
     input >> Height;
     input >> TotalVolume;
     int i = TotalVolume;
-    while(i >= 0)
+    while((i >= 0) || (!input.eof()))
     {
         input >> SingleVolume[Counter];
         if(SingleVolume[Counter] <= 0)
         {
+            output << "Введены неверные данные!" << endl;
             cout << "Введены неверные данные!" << endl;
             exit(3);
         }
