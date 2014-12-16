@@ -32,10 +32,60 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <sstream>
+#include <string>
 
 using namespace std;
 
 //---------------------------------------------------------------------------------------------
+
+void Is_Float(fstream& input)
+{
+    int Minus = 0; // Кол-во минусов в строке
+    int Dot = 0;   // Кол-во точек в строке
+    int Space = 0; // Кол-во пробелов в строке
+    string str;
+    for(int k = 0; k < 20; ++k)
+    {
+        while (!input.eof())
+        {
+            stringstream ss;
+            char c;
+            while(input.get(c))
+            {
+                cout << "c = " << c << endl;
+                cout << Minus << " " << Dot << " " << Space << endl;
+                if((Minus <= Space) && (Dot <= Space))
+                {
+                    if(c == '\n') ++Space;
+                    if(c == '-')
+                    {
+                        ++Minus;
+                    }
+                    if(c == '.')
+                    {
+                        ++Dot;
+                    }
+                    ss << ((isdigit(c) || (c == '-') || (c == '.')) ? c : ' ');
+                    continue;
+                }
+                else
+                {
+                    cout << "Обнаружена ошибка! Проверьте входные данные!\n";
+                    exit(4);
+                }
+            }
+            
+            while(ss >> str)
+            {
+
+            }
+        }
+    }
+    cout << str << endl;
+    input.clear();
+    // return 0;
+}
 
 float F1(float R, float r, float D)
 {
@@ -94,6 +144,8 @@ int main(int argc, const char * argv[])
     int Counter = 0;                      // Счетчик
     int Counter1 = 0;                     // Вспомогательный счетчик
     float  Pi = 3.14159265358979;         // Число π
+    
+    Is_Float(input);
     
     // Считываем переменные из файла
     input >> Diametr;
