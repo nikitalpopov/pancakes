@@ -39,8 +39,9 @@ using namespace std;
 
 //---------------------------------------------------------------------------------------------
 
-void Is_Float(fstream& input)
+void Is_Float(const char * argv)
 {
+    fstream input(argv);
     int Minus = 0; // Кол-во минусов в строке
     int Dot = 0;   // Кол-во точек в строке
     int Space = 0; // Кол-во пробелов в строке
@@ -53,26 +54,38 @@ void Is_Float(fstream& input)
             char c;
             while(input.get(c))
             {
-                cout << "c = " << c << endl;
-                cout << Minus << " " << Dot << " " << Space << endl;
-                if((Minus <= Space) && (Dot <= Space))
+                if(((c >= '0') && (c <= '9')) || (c == '-') || (c == '.') || (c == '\n') || (c == ' '))
                 {
-                    if(c == '\n') ++Space;
-                    if(c == '-')
+                    if(Minus + Dot <= Space)
                     {
-                        ++Minus;
+                        if(c == '\n')
+                        {
+                            Space = 0;
+                            Minus = 0;
+                            Dot = 0;
+                            Space += 2;
+                        }
+                        if(c == '-')
+                        {
+                            ++Minus;
+                        }
+                        if(c == '.')
+                        {
+                            ++Dot;
+                        }
+                        ss << ((isdigit(c) || (c == '-') || (c == '.')) ? c : ' ');
+                        continue;
                     }
-                    if(c == '.')
+                    else
                     {
-                        ++Dot;
+                        cout << "Обнаружена ошибка! Проверьте входные данные!\n";
+                        exit(4);
                     }
-                    ss << ((isdigit(c) || (c == '-') || (c == '.')) ? c : ' ');
-                    continue;
                 }
                 else
                 {
                     cout << "Обнаружена ошибка! Проверьте входные данные!\n";
-                    exit(4);
+                    exit(5);
                 }
             }
             
@@ -82,9 +95,7 @@ void Is_Float(fstream& input)
             }
         }
     }
-    cout << str << endl;
-    input.clear();
-    // return 0;
+    input.close();
 }
 
 float F1(float R, float r, float D)
@@ -113,6 +124,8 @@ float NewRadius(float R, float r, float D, float Square)
 
 int main(int argc, const char * argv[])
 {
+    Is_Float(argv[1]);
+    
     // Подключаем файлы как параметры строки
     fstream input(argv[1]);
     fstream output(argv[2], ios_base::out | ios_base::trunc);
@@ -133,6 +146,7 @@ int main(int argc, const char * argv[])
     float Diametr = 0;                    // Диаметр сковороды
     float Height = 0;                     // Толщина блина
     float TotalVolume = 0;                // Объем кастрюли
+    float TotalVolume1 = 0;
     float *SingleVolume = new float[100]; // Объем поварешки
     float *X = new float[100];            // Координаты
     float *Y = new float[100];            // центра блина
@@ -145,20 +159,20 @@ int main(int argc, const char * argv[])
     int Counter1 = 0;                     // Вспомогательный счетчик
     float  Pi = 3.14159265358979;         // Число π
     
-    Is_Float(input);
-    
     // Считываем переменные из файла
     input >> Diametr;
     input >> Height;
     input >> TotalVolume;
     int i = TotalVolume;
-    while((i >= 0) || (!input.eof()))
+    TotalVolume1 = TotalVolume;
+    while(!input.eof() || (TotalVolume1 > 0))
     {
         input >> SingleVolume[Counter];
+        TotalVolume1 = TotalVolume1 - SingleVolume[Counter];
         if(SingleVolume[Counter] <= 0)
         {
             output << "Введены неверные данные!" << endl;
-            cout << "Введены неверные данные!" << endl;
+            cout << SingleVolume[Counter] << endl << "Введены неверные данные!" << endl;
             exit(3);
         }
         input >> X[Counter] >> Y[Counter];
@@ -168,12 +182,14 @@ int main(int argc, const char * argv[])
     
     // Дополнительной объявление переменных и присвоение значений
     Counter1 = Counter;
+    TotalVolume1 = TotalVolume / Height + 0.0008;
     float *Radius = new float[Counter];   // Массив со значениями радиуса каждого нового блина
     
     // Основной алгоритм
     while(Counter != 0)
     {
         StepVolume = TotalVolume / Height;
+        
         for(int k = 0; k < Counter1; ++k)
         {
             SingleVolume[k] = SingleVolume[k] / Height; // Находим площадь каждого блина
@@ -188,7 +204,6 @@ int main(int argc, const char * argv[])
             if(Radius[k] >= Diametr / 2.0)
             {
                 Opportunity = false;
-                // Radius[k] = Diametr;
             }
             for(int i = 0; i < k; ++i)
             {
@@ -205,6 +220,10 @@ int main(int argc, const char * argv[])
                 }
             }
             
+            if(TotalVolume1 < Pi * Radius[k] * Radius[k])
+            {
+                continue;
+            }
             if(Opportunity && (StepVolume + 0.00001 >= (Pi * Radius[k] * Radius[k])))
             {
                 if((sqrt(pow(X[k], 2) + pow(Y[k], 2)) + Radius[k]) <= (Diametr / 2.0))
@@ -214,6 +233,7 @@ int main(int argc, const char * argv[])
                         continue;
                     }
                     StepVolume = StepVolume - Pi * Radius[k] * Radius[k];
+                    TotalVolume1 = TotalVolume1 - Pi * Radius[k] * Radius[k];
                     Radius[k] = Diametr;
                     ++Ideal;
                     ++Total;
@@ -228,6 +248,7 @@ int main(int argc, const char * argv[])
                     }
                     Radius[k] = NewRadius(Diametr / 2.0, Radius[k], sqrt(pow(X[k], 2) + pow(Y[k], 2)), SingleVolume[k]);
                     StepVolume = StepVolume - Pi * Radius[k] * Radius[k];
+                    TotalVolume1 = TotalVolume1 - Pi * Radius[k] * Radius[k];
                     ++Total;
                     --Counter;
                 }   // Вычисляем радиус блина, соприкасающегося со стенкой

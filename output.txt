@@ -1,1 +1,4 @@
-Введены неверные данные!
+//Users/nikitapopov/Documents/XCode/Pancakes/Pancakes/input10.txt
+Кол-во идеальных блинов: 2
+Т.е. 50 процентов от всех (4) блинов
+Кол-во подходов: 2
