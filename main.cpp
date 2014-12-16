@@ -29,7 +29,6 @@
 //---------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------
 
-
 #include <iostream>
 #include <fstream>
 #include <cmath>
@@ -94,7 +93,6 @@ int main(int argc, const char * argv[])
     int Total = 0;                        // Всего блинов
     int Counter = 0;                      // Счетчик
     int Counter1 = 0;                     // Вспомогательный счетчик
-    int k = 0;                            // Ещё один счетчик
     float  Pi = 3.14159265358979;         // Число π
     
     // Считываем переменные из файла
@@ -110,9 +108,7 @@ int main(int argc, const char * argv[])
             cout << "Введены неверные данные!" << endl;
             exit(3);
         }
-        cout << SingleVolume[Counter] << endl;
         input >> X[Counter] >> Y[Counter];
-        cout << X[Counter] << endl << Y[Counter] << endl;
         i = i - SingleVolume[Counter];
         ++Counter;
     }
@@ -125,7 +121,7 @@ int main(int argc, const char * argv[])
     while(Counter != 0)
     {
         StepVolume = TotalVolume / Height;
-        for(; k < Counter1; ++k)
+        for(int k = 0; k < Counter1; ++k)
         {
             SingleVolume[k] = SingleVolume[k] / Height; // Находим площадь каждого блина
             Radius[k] = sqrt(SingleVolume[k] / Pi);     // Находим радиус этого круга (при условии, что
@@ -139,13 +135,13 @@ int main(int argc, const char * argv[])
             if(Radius[k] >= Diametr / 2.0)
             {
                 Opportunity = false;
-                --Counter;
+                // Radius[k] = Diametr;
             }
-            for(int i = 0; i < (k - 1); ++i)
+            for(int i = 0; i < k; ++i)
             {
                 if(Opportunity)
                 {
-                    if((sqrt(pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2))) >= Radius[i] + Radius[k])
+                     if(((pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2)) >= pow(Radius[i] + Radius[k], 2)) || ((((pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2)) <= pow(Radius[i], 2)) || ((pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2)) <= pow(Radius[k], 2))) && ((X[i] == X[k]) && (Y[i] == Y[k]))))
                     {
                         Opportunity = false; // Если блин попадает на уже жарящийся блин
                     }
@@ -185,7 +181,6 @@ int main(int argc, const char * argv[])
             }
             else
             {
-                --Counter;
                 continue;
             }
         }
@@ -194,14 +189,14 @@ int main(int argc, const char * argv[])
         {
             ++Step;
         }
-        
-        if((Total == 0) && (Step == 0))
+        else
         {
             break;
         }
     }
     
     // Вывод результатов
+    output << argv[1] << endl;
     if((Total == 0) && (Ideal == 0))
     {
         output << "Испечено 0 блинов" << endl;
