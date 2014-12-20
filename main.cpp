@@ -28,6 +28,16 @@
 //---------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------
+//
+//  Описание ошибок ("Program ended with exit code: *k*")
+//  1 : Не открывается файл с исходными данными
+//  2 : Не открывается файл с выходными данными
+//  3 : Две точки или два минуса в числе в исходных данных
+//  4 : Символ, отличный от цифр, "-", ".", " " в исходных данных
+//
+//---------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 
 #include <iostream>
 #include <fstream>
@@ -44,7 +54,7 @@ void Is_Float(const char * argv)
     fstream input(argv);
     int Minus = 0; // Кол-во минусов в строке
     int Dot = 0;   // Кол-во точек в строке
-    int Space = 0; // Кол-во пробелов в строке
+    // int Space = 0; // Кол-во пробелов в строке
     string str;
     for(int k = 0; k < 20; ++k)
     {
@@ -56,36 +66,32 @@ void Is_Float(const char * argv)
             {
                 if(((c >= '0') && (c <= '9')) || (c == '-') || (c == '.') || (c == '\n') || (c == ' '))
                 {
-                    if(Minus + Dot <= Space)
+                    
+                    if(c == '\n')
                     {
-                        if(c == '\n')
-                        {
-                            Space = 0;
-                            Minus = 0;
-                            Dot = 0;
-                            Space += 2;
-                        }
-                        if(c == '-')
-                        {
-                            ++Minus;
-                        }
-                        if(c == '.')
-                        {
-                            ++Dot;
-                        }
-                        ss << ((isdigit(c) || (c == '-') || (c == '.')) ? c : ' ');
-                        continue;
+                        Minus = 0;
+                        Dot = 0;
                     }
-                    else
+                    if(c == '-')
+                    {
+                        ++Minus;
+                    }
+                    if(c == '.')
+                    {
+                        ++Dot;
+                    }
+                    if((Dot > 1) || (Minus > 1))
                     {
                         cout << "Обнаружена ошибка! Проверьте входные данные!\n";
-                        exit(4);
+                        exit(3);
                     }
+                    ss << ((isdigit(c) || (c == '-') || (c == '.')) ? c : ' ');
+                    continue;
                 }
                 else
                 {
                     cout << "Обнаружена ошибка! Проверьте входные данные!\n";
-                    exit(5);
+                    exit(4);
                 }
             }
             
@@ -165,36 +171,44 @@ int main(int argc, const char * argv[])
     input >> TotalVolume;
     int i = TotalVolume;
     TotalVolume1 = TotalVolume;
-    while(!input.eof() || (TotalVolume1 > 0))
+    while(!input.eof())
     {
         input >> SingleVolume[Counter];
-        TotalVolume1 = TotalVolume1 - SingleVolume[Counter];
-        if(SingleVolume[Counter] <= 0)
+//        if(SingleVolume[Counter] <= 0)
+//        {
+//            output << "Введены неверные данные!" << endl;
+//            cout << SingleVolume[Counter] << endl << "Введены неверные данные!" << endl;
+//            exit(3);
+//        }
+        if(TotalVolume1 - SingleVolume[Counter] < 0)
         {
-            output << "Введены неверные данные!" << endl;
-            cout << SingleVolume[Counter] << endl << "Введены неверные данные!" << endl;
-            exit(3);
+            break;
         }
+        TotalVolume1 = TotalVolume1 - SingleVolume[Counter];
         input >> X[Counter] >> Y[Counter];
         i = i - SingleVolume[Counter];
         ++Counter;
     }
-    
+
     // Дополнительной объявление переменных и присвоение значений
     Counter1 = Counter;
-    TotalVolume1 = TotalVolume / Height + 0.0008;
+    TotalVolume1 = TotalVolume / Height + 0.000001;
     float *Radius = new float[Counter];   // Массив со значениями радиуса каждого нового блина
     
     // Основной алгоритм
-    while(Counter != 0)
+    while(Counter > 0)
     {
         StepVolume = TotalVolume / Height;
+        cout << TotalVolume1 << endl;
+        cout << "-- " << Total << " " << Counter1 << endl;
+        int End = Counter1;
         
         for(int k = 0; k < Counter1; ++k)
         {
             SingleVolume[k] = SingleVolume[k] / Height; // Находим площадь каждого блина
             Radius[k] = sqrt(SingleVolume[k] / Pi);     // Находим радиус этого круга (при условии, что
                                                         // он не пересекается стенками сковороды)
+            cout << k << " " << Radius[k] << endl;
             if((X[k] * X[k] + Y[k] * Y[k]) >= (Diametr * Diametr / 4.0))
             {
                 Radius[k] = Diametr;
@@ -267,8 +281,20 @@ int main(int argc, const char * argv[])
         {
             break;
         }
+        
+        for(int k = 0; k < Counter1; ++k)
+        {
+            if(Radius[k] == Diametr)
+            {
+                --End;
+            }
+        }
+        if(End == 0)
+        {
+            break;
+        }
     }
-    
+
     // Вывод результатов
     output << argv[1] << endl;
     if((Total == 0) && (Ideal == 0))
