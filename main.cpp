@@ -199,6 +199,7 @@ int main(int argc, const char * argv[])
     }
     
     // Основной алгоритм
+    output << argv[1] << endl;
     while(Counter > 0)
     {
         StepVolume = TotalVolume / Height;
@@ -222,9 +223,10 @@ int main(int argc, const char * argv[])
             cout << k << " | " << Usage[k] << " | " << Usage[k + Counter1] << endl;
             for(int i = 0; i < k; ++i)
             {
-                if(Usage[k] != 1)
+                cout << i << " | " << Usage[i] << " | " << Usage[i + Counter1] << endl;
+                if((Usage[i] == 1) && (Usage[k + Counter1] == 0))
                 {
-                     if((pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2)) <= pow(Radius[i] + Radius[k], 2) || ((pow((X[i] - X[k]), 2) + pow((X[i] - X[k]), 2)) == 0 && Radius[i] == Radius[k]))
+                     if(((pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2)) <= pow(Radius[i] + Radius[k], 2) || ((pow((X[i] - X[k]), 2) + pow((X[i] - X[k]), 2)) == 0 && Radius[i] == Radius[k])))
                     {
                         Usage[k] = 1; // Если блин попадает на уже жарящийся блин
                     }
@@ -239,6 +241,7 @@ int main(int argc, const char * argv[])
             {
                 continue;
             }
+            cout << k << " | " << Usage[k] << " | " << Usage[k + Counter1] << endl;
 
             if(((Usage[k] == 0) && (Usage[k + Counter1] == 0)) && (StepVolume + 0.1 >= (Pi * Radius[k] * Radius[k])))
             {
@@ -265,7 +268,7 @@ int main(int argc, const char * argv[])
                 }   // Вычисляем радиус блина, соприкасающегося со стенкой
             }
             cout << k << " | " << Usage[k] << " | " << TotalVolume1 << " | " << StepVolume << " " << Pi * Radius[k] * Radius[k] << endl;
-            cout << "Total " << Total << endl;
+            cout << "Total " << Total << endl << endl;
         }
         
         if(Total > 0)

@@ -1,0 +1,5 @@
+//Users/nikitapopov/Documents/XCode/Pancakes/Pancakes/input3.txt
+//Users/nikitapopov/Documents/XCode/Pancakes/Pancakes/input3.txt
+Кол-во идеальных блинов: 0
+Т.е. 0 процентов от всех (16) блинов
+Кол-во подходов: 2
