@@ -174,12 +174,6 @@ int main(int argc, const char * argv[])
     while(!input.eof())
     {
         input >> SingleVolume[Counter];
-//        if(SingleVolume[Counter] <= 0)
-//        {
-//            output << "Введены неверные данные!" << endl;
-//            cout << SingleVolume[Counter] << endl << "Введены неверные данные!" << endl;
-//            exit(3);
-//        }
         if(TotalVolume1 - SingleVolume[Counter] < 0)
         {
             break;
@@ -192,40 +186,47 @@ int main(int argc, const char * argv[])
 
     // Дополнительной объявление переменных и присвоение значений
     Counter1 = Counter;
-    TotalVolume1 = TotalVolume / Height + 0.000001;
-    float *Radius = new float[Counter];   // Массив со значениями радиуса каждого нового блина
+    TotalVolume1 = TotalVolume / Height + 0.00001;
+    float *Radius = new float[Counter1];   // Массив со значениями радиуса каждого нового блина
+    for(int i = 0; i < Counter1; ++i)
+    {
+        Radius[i] = 0;
+    }
+    float *Usage = new float[2 * Counter1]; // Массив  со значениями использования блина (0 - нет, 1 - да)
+    for(int i = 0; i < 2 * Counter1; ++i)   // Первые Counter1 элементов - значения в текущем круге,
+    {                                       // вторые Counter1 элементов - значения в общем
+        Usage[i] = 0;
+    }
     
     // Основной алгоритм
     while(Counter > 0)
     {
         StepVolume = TotalVolume / Height;
-        cout << TotalVolume1 << endl;
-        cout << "-- " << Total << " " << Counter1 << endl;
-        int End = Counter1;
+        for(int i = 0; i < Counter1; ++i)
+        {
+            Usage[i] = 0;
+        }
         
+        cout << endl << "----------" << endl;
         for(int k = 0; k < Counter1; ++k)
         {
             SingleVolume[k] = SingleVolume[k] / Height; // Находим площадь каждого блина
             Radius[k] = sqrt(SingleVolume[k] / Pi);     // Находим радиус этого круга (при условии, что
                                                         // он не пересекается стенками сковороды)
-            cout << k << " " << Radius[k] << endl;
-            if((X[k] * X[k] + Y[k] * Y[k]) >= (Diametr * Diametr / 4.0))
+            if((X[k] * X[k] + Y[k] * Y[k]) >= (Diametr * Diametr / 4.0) || (Radius[k] >= Diametr / 2.0))
             {
-                Radius[k] = Diametr;
+                Usage[k] = 1; // Невозможно выпечь блин
+                Usage[k + Counter1] = 1;
             }
-            
-            bool Opportunity = true; // Возможность выпечь блин (true - нет на пути других блинов)
-            if(Radius[k] >= Diametr / 2.0)
-            {
-                Opportunity = false;
-            }
+
+            cout << k << " | " << Usage[k] << " | " << Usage[k + Counter1] << endl;
             for(int i = 0; i < k; ++i)
             {
-                if(Opportunity)
+                if(Usage[k] != 1)
                 {
-                     if(((pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2)) >= pow(Radius[i] + Radius[k], 2)) || ((((pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2)) <= pow(Radius[i], 2)) || ((pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2)) <= pow(Radius[k], 2))) && ((X[i] == X[k]) && (Y[i] == Y[k]))))
+                     if((pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2)) <= pow(Radius[i] + Radius[k], 2) || ((pow((X[i] - X[k]), 2) + pow((X[i] - X[k]), 2)) == 0 && Radius[i] == Radius[k]))
                     {
-                        Opportunity = false; // Если блин попадает на уже жарящийся блин
+                        Usage[k] = 1; // Если блин попадает на уже жарящийся блин
                     }
                 }
                 else
@@ -238,17 +239,15 @@ int main(int argc, const char * argv[])
             {
                 continue;
             }
-            if(Opportunity && (StepVolume + 0.00001 >= (Pi * Radius[k] * Radius[k])))
+
+            if(((Usage[k] == 0) && (Usage[k + Counter1] == 0)) && (StepVolume + 0.1 >= (Pi * Radius[k] * Radius[k])))
             {
                 if((sqrt(pow(X[k], 2) + pow(Y[k], 2)) + Radius[k]) <= (Diametr / 2.0))
                 {
-                    if(Radius[k] == Diametr)
-                    {
-                        continue;
-                    }
                     StepVolume = StepVolume - Pi * Radius[k] * Radius[k];
                     TotalVolume1 = TotalVolume1 - Pi * Radius[k] * Radius[k];
-                    Radius[k] = Diametr;
+                    Usage[k] = 1;
+                    Usage[k + Counter1] = 1;
                     ++Ideal;
                     ++Total;
                     --Counter;
@@ -256,21 +255,17 @@ int main(int argc, const char * argv[])
                 
                 if((sqrt(pow(X[k], 2) + pow(Y[k], 2)) + Radius[k]) > (Diametr / 2.0))
                 {
-                    if(Radius[k] == Diametr)
-                    {
-                        continue;
-                    }
                     Radius[k] = NewRadius(Diametr / 2.0, Radius[k], sqrt(pow(X[k], 2) + pow(Y[k], 2)), SingleVolume[k]);
                     StepVolume = StepVolume - Pi * Radius[k] * Radius[k];
                     TotalVolume1 = TotalVolume1 - Pi * Radius[k] * Radius[k];
+                    Usage[k] = 1;
+                    Usage[k + Counter1] = 1;
                     ++Total;
                     --Counter;
                 }   // Вычисляем радиус блина, соприкасающегося со стенкой
             }
-            else
-            {
-                continue;
-            }
+            cout << k << " | " << Usage[k] << " | " << TotalVolume1 << " | " << StepVolume << " " << Pi * Radius[k] * Radius[k] << endl;
+            cout << "Total " << Total << endl;
         }
         
         if(Total > 0)
@@ -278,18 +273,6 @@ int main(int argc, const char * argv[])
             ++Step;
         }
         else
-        {
-            break;
-        }
-        
-        for(int k = 0; k < Counter1; ++k)
-        {
-            if(Radius[k] == Diametr)
-            {
-                --End;
-            }
-        }
-        if(End == 0)
         {
             break;
         }
@@ -314,6 +297,7 @@ int main(int argc, const char * argv[])
     delete []X;
     delete []Y;
     delete []Radius;
+    delete []Usage;
     
     // Закрываем использованные файлы
     input.close();
@@ -322,3 +306,5 @@ int main(int argc, const char * argv[])
     // Завершаем выполнение программы
     return 0;
 }
+
+//if(((pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2)) >= pow(Radius[i] + Radius[k], 2)) || ((((pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2)) <= pow(Radius[i], 2)) || ((pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2)) <= pow(Radius[k], 2))) && ((X[i] == X[k]) && (Y[i] == Y[k]))))
