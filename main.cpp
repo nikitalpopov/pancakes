@@ -161,6 +161,7 @@ int main(int argc, const char * argv[])
                                           // в этом подходе
     int Step = 0;                         // Кол-во подходов
     int Total = 0;                        // Всего блинов
+    int Pancakes_Per_Step = 0;            // Кол-во блинов, выпеченных за подход
     int Counter = 0;                      // Счетчик
     int Counter1 = 0;                     // Вспомогательный счетчик
     float  Pi = 3.14159265358979;         // Число π
@@ -186,7 +187,7 @@ int main(int argc, const char * argv[])
 
     // Дополнительной объявление переменных и присвоение значений
     Counter1 = Counter;
-    TotalVolume1 = TotalVolume / Height + 0.00001;
+    TotalVolume1 = TotalVolume / Height + 0.001;
     float *Radius = new float[Counter1];   // Массив со значениями радиуса каждого нового блина
     for(int i = 0; i < Counter1; ++i)
     {
@@ -202,13 +203,13 @@ int main(int argc, const char * argv[])
     output << argv[1] << endl;
     while(Counter > 0)
     {
+        Pancakes_Per_Step = 0;
         StepVolume = TotalVolume / Height;
         for(int i = 0; i < Counter1; ++i)
         {
             Usage[i] = 0;
         }
         
-        cout << endl << "----------" << endl;
         for(int k = 0; k < Counter1; ++k)
         {
             SingleVolume[k] = SingleVolume[k] / Height; // Находим площадь каждого блина
@@ -220,11 +221,9 @@ int main(int argc, const char * argv[])
                 Usage[k + Counter1] = 1;
             }
 
-            cout << k << " | " << Usage[k] << " | " << Usage[k + Counter1] << endl;
             for(int i = 0; i < k; ++i)
             {
-                cout << i << " | " << Usage[i] << " | " << Usage[i + Counter1] << endl;
-                if((Usage[i] == 1) && (Usage[k + Counter1] == 0))
+                if((Usage[i] == 1) && (Usage[i + Counter1] == 1))
                 {
                      if(((pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2)) <= pow(Radius[i] + Radius[k], 2) || ((pow((X[i] - X[k]), 2) + pow((X[i] - X[k]), 2)) == 0 && Radius[i] == Radius[k])))
                     {
@@ -233,7 +232,7 @@ int main(int argc, const char * argv[])
                 }
                 else
                 {
-                    break;
+                    continue;
                 }
             }
             
@@ -241,7 +240,6 @@ int main(int argc, const char * argv[])
             {
                 continue;
             }
-            cout << k << " | " << Usage[k] << " | " << Usage[k + Counter1] << endl;
 
             if(((Usage[k] == 0) && (Usage[k + Counter1] == 0)) && (StepVolume + 0.1 >= (Pi * Radius[k] * Radius[k])))
             {
@@ -251,6 +249,7 @@ int main(int argc, const char * argv[])
                     TotalVolume1 = TotalVolume1 - Pi * Radius[k] * Radius[k];
                     Usage[k] = 1;
                     Usage[k + Counter1] = 1;
+                    ++Pancakes_Per_Step;
                     ++Ideal;
                     ++Total;
                     --Counter;
@@ -263,12 +262,11 @@ int main(int argc, const char * argv[])
                     TotalVolume1 = TotalVolume1 - Pi * Radius[k] * Radius[k];
                     Usage[k] = 1;
                     Usage[k + Counter1] = 1;
+                    ++Pancakes_Per_Step;
                     ++Total;
                     --Counter;
                 }   // Вычисляем радиус блина, соприкасающегося со стенкой
             }
-            cout << k << " | " << Usage[k] << " | " << TotalVolume1 << " | " << StepVolume << " " << Pi * Radius[k] * Radius[k] << endl;
-            cout << "Total " << Total << endl << endl;
         }
         
         if(Total > 0)
@@ -277,6 +275,11 @@ int main(int argc, const char * argv[])
         }
         else
         {
+            break;
+        }
+        if((Step > 0) && (Pancakes_Per_Step == 0))
+        {
+            --Step;
             break;
         }
     }
