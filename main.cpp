@@ -312,5 +312,3 @@ int main(int argc, const char * argv[])
     // Завершаем выполнение программы
     return 0;
 }
-
-//if(((pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2)) >= pow(Radius[i] + Radius[k], 2)) || ((((pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2)) <= pow(Radius[i], 2)) || ((pow(X[i] - X[k], 2) + pow(Y[i] - Y[k], 2)) <= pow(Radius[k], 2))) && ((X[i] == X[k]) && (Y[i] == Y[k]))))
