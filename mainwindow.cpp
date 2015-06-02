@@ -30,10 +30,11 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_clicked()
 {
     pan->setPanRadius(ui->lineEdit->text().toDouble());
-    pan->setPanRadius(pan->getPanRadius() / 2);
+    pan->setPanRadius(pan->getPanRadius() / 2.0);
 
+    scene->clear();
     drawPan();
-    ui->graphicsView->scale(ui->graphicsView->width()/(pan->getPanRadius() * 100), ui->graphicsView->height()/(pan->getPanRadius() * 100));
+    ui->graphicsView->scale(ui->graphicsView->width() / (pan->getPanRadius() * 100.0), ui->graphicsView->height() / (pan->getPanRadius() * 100.0));
 
     QString s;
     s.setNum(pan->getPanRadius());
@@ -191,12 +192,11 @@ unsigned MainWindow::getCounter()
 
 void MainWindow::drawPan()
 {
-    scene->clear();
     brush.setStyle(Qt::NoBrush);
-    brush.setColor(QColor(Qt::transparent));
-    scene->addEllipse((pan->getPanRadius()) * (-25), (pan->getPanRadius()) * (-25), (pan->getPanRadius()) * 50, (pan->getPanRadius()) * 50, pen, brush);
-    scene->addEllipse((pan->getPanRadius()) * (-25) - 1, (pan->getPanRadius()) * (-25) - 1, (pan->getPanRadius()) * 50 + 2, (pan->getPanRadius()) * 50 + 2, pen, brush);
-    scene->addEllipse((pan->getPanRadius()) * (-25) - 2, (pan->getPanRadius()) * (-25) - 2, (pan->getPanRadius()) * 50 + 4, (pan->getPanRadius()) * 50 + 4, pen, brush);
+    pen.setWidth(0);
+    scene->addEllipse((pan->getPanRadius()) * (-25.0),     (pan->getPanRadius()) * (-25.0),     (pan->getPanRadius()) * 50.0,     (pan->getPanRadius()) * 50.0,     pen, brush);
+    //  scene->addEllipse((pan->getPanRadius()) * (-25.0) - 1, (pan->getPanRadius()) * (-25.0) - 1, (pan->getPanRadius()) * 50.0 + 2, (pan->getPanRadius()) * 50.0 + 2, pen, brush);
+    //  scene->addEllipse((pan->getPanRadius()) * (-25.0) - 2, (pan->getPanRadius()) * (-25.0) - 2, (pan->getPanRadius()) * 50.0 + 4, (pan->getPanRadius()) * 50.0 + 4, pen, brush);
     scene->addEllipse(0, 0, 1, 1, pen, brush);
 }
 
@@ -205,5 +205,5 @@ void MainWindow::drawPancake(unsigned n)
     pen.setColor(QColor("black"));
     brush.setColor(QColor("orange"));
     brush.setStyle(Qt::SolidPattern);
-    scene->addEllipse(25 * (pan->getCakeX(n) - pan->getCakeRadius(n)), (-25) * (pan->getCakeY(n) + pan->getCakeRadius(n)), pan->getCakeRadius(n) * 50, pan->getCakeRadius(n) * 50, pen, brush);
+    scene->addEllipse(25 * (pan->getCakeX(n) - pan->getCakeRadius(n)), (-25.0) * (pan->getCakeY(n) + pan->getCakeRadius(n)), pan->getCakeRadius(n) * 50.0, pan->getCakeRadius(n) * 50.0, pen, brush);
 }

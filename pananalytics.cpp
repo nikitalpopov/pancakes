@@ -207,6 +207,7 @@ void     panAnalytics::runAnalytics()
                 {
                     s.setNum(i);
                     s = "Pancake[" + s + "] can't be baked\n";
+                    gui->addStringToConsole(s);
                     unbaked++;
                     totalVolume = totalVolume - getCakeVolume(i);
                     stepVolume = stepVolume - getCakeVolume(i);
@@ -237,6 +238,13 @@ void     panAnalytics::runAnalytics()
     s = "Pancakes baked: " + s + " in " + c + " steps\n";
     gui->addStringToConsole(s);
 
+    if (unbaked > 0)
+    {
+        s.setNum(unbaked);
+        s = "Unbaked " + s + " cake(s)\n";
+        gui->addStringToConsole(s);
+    }
+
     s.setNum(ideal);
     s = "Ideal: " + s + "\n";
     gui->addStringToConsole(s);
@@ -250,8 +258,9 @@ void     panAnalytics::runAnalytics()
         double res = (double)ideal / baked;
         s.setNum(((res) * 100));
     }
-    s = "Percentage: " + s + " %\n";
+    s = "Percentage: " + s + " %\n\n";
     gui->addStringToConsole(s);
+    gui->drawPan();
 }
 
 void     panAnalytics::checkCake(unsigned n, double currentVolume)
